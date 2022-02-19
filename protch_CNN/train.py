@@ -207,7 +207,7 @@ def main():
     # save_path = './CNN_best.pth'
     train_steps = len(train_loader)
 
-    criterion = nn.CrossEntropyLoss()
+    
     for epoch in range( hyper_params['epochs']):
         # train
         net.train()
