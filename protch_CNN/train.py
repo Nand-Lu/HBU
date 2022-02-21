@@ -120,7 +120,7 @@ def main():
     data_transform = {
             "train": transforms.Compose([# transforms.CenterCrop(224),单通道灰度图需要这行
                                          transforms.Resize((hyper_params["input_size"],hyper_params["input_size"])),#transforms.RandomResizedCrop(224),
-                                         Cutout(),
+                                         #Cutout(),效果不见得会好，与下面的图像增强最好不一起用，慎用
                                          transforms.RandomHorizontalFlip(),
                                          transforms.RandomVerticalFlip(p=1),
                                          transforms.ColorJitter(brightness=0.5, contrast=0.5, hue=0),
