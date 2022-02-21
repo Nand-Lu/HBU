@@ -11,6 +11,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from model.CNN import CNN
 from model.resnet import *
+#from model.resnet_cbam import *  这个和上一条必须选择注释一个，否则模型选择的时候会有冲突。这个模型加了注意力机制
 from hyper_params  import  hyper_params
 import numpy as np
 from prettytable import PrettyTable
