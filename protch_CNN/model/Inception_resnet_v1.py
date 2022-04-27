@@ -1,13 +1,7 @@
 import torch
 import torch.nn as nn
 from hyper_params  import  hyper_params
-from torch.hub import load_state_dict_from_url
-import torch.nn.functional as F
-'''
-Figure 3.
-The schema for stem of the pure Inception_v4 and Inception-ResNet-v2 networks.
-This is the input part of those networks.Cf.Figures 9 and 15
-'''
+
 class conv3x3(nn.Module):
     def __init__(self, in_planes, out_channels, stride=1, padding=0):
         super(conv3x3, self).__init__()
@@ -62,7 +56,7 @@ class StemV1(nn.Module):
         return x
 
 class Inception_ResNet_A(nn.Module):
-    def __init__(self, input ):
+    def __init__(self, input, scale=0.3):
         super(Inception_ResNet_A, self).__init__()
         self.conv1 = conv1x1(in_planes =input,out_channels=32,stride=1, padding=0)
         self.conv2 = conv3x3(in_planes=32, out_channels=32, stride=1, padding=1)
@@ -70,6 +64,7 @@ class Inception_ResNet_A(nn.Module):
 
         self.relu = nn.ReLU()
 
+        self.scale = scale
     def forward(self, x):
 
         c1 = self.conv1(x)
@@ -89,13 +84,13 @@ class Inception_ResNet_A(nn.Module):
 
         line = self.line(cat)
         # print("line",line.shape)
-        out =x+line
+        out =self.scale*x +line
         out = self.relu(out)
 
         return out
 
 class Inception_ResNet_B(nn.Module):
-    def __init__(self, input):
+    def __init__(self, input, scale=0.3):
         super(Inception_ResNet_B, self).__init__()
         self.conv1 = conv1x1(in_planes =input,out_channels=128,stride=1, padding=0)
         self.conv1x7 = nn.Conv2d(in_channels=128,out_channels=128,kernel_size=(1,7), padding=(0,3))
@@ -104,6 +99,7 @@ class Inception_ResNet_B(nn.Module):
 
         self.relu = nn.ReLU()
 
+        self.scale = scale
     def forward(self, x):
 
         c1 = self.conv1(x)
@@ -122,7 +118,7 @@ class Inception_ResNet_B(nn.Module):
 
         cat = torch.cat([c1, c2_2], dim=1)
         line = self.line(cat)
-        out =x+line
+        out = self.scale*x+line
 
         out = self.relu(out)
         # print("out", out.shape)
@@ -130,7 +126,7 @@ class Inception_ResNet_B(nn.Module):
 
 
 class Inception_ResNet_C(nn.Module):
-    def __init__(self, input):
+    def __init__(self, input, scale=0.3):
         super(Inception_ResNet_C, self).__init__()
         self.conv1 = conv1x1(in_planes=input, out_channels=192, stride=1, padding=0)
         self.conv1x3 = nn.Conv2d(in_channels=192, out_channels=192, kernel_size=(1, 3), padding=(0,1))
@@ -139,6 +135,7 @@ class Inception_ResNet_C(nn.Module):
 
         self.relu = nn.ReLU()
 
+        self.scale =scale
     def forward(self, x):
         c1 = self.conv1(x)
         # print("x", x.shape)
@@ -156,14 +153,14 @@ class Inception_ResNet_C(nn.Module):
         cat = torch.cat([c1, c2_2], dim=1)
         # print("cat", cat.shape)
         line = self.line(cat)
-        out = x+ line
+        out = self.scale *x + line
         # print("out", out.shape)
         out = self.relu(out)
 
         return out
 
 class Reduction_A(nn.Module):
-    def __init__(self, input,n=384,k=192,l=224,m=256):
+    def __init__(self, input,n=384,k=192,l=192,m=256):
         super(Reduction_A, self).__init__()
         self.maxpool = nn.MaxPool2d(kernel_size=3,  stride=2, padding=0)
         self.conv1 = conv3x3(in_planes=input, out_channels=n,stride=2,padding=0)
@@ -219,9 +216,9 @@ class Reduction_B(nn.Module):
         return cat
 
 
-class Inception_ResNet(nn.Module):
+class Inception_ResNet_v1(nn.Module):
     def __init__(self,classes=2):
-        super(Inception_ResNet, self).__init__()
+        super(Inception_ResNet_v1, self).__init__()
         blocks = []
         blocks.append(StemV1(in_planes=3))
         for i in range(5):
