@@ -31,7 +31,7 @@ class conv1x1(nn.Module):
 
 class StemV2(nn.Module):
     def __init__(self, in_planes=3):
-        super(StemV1, self).__init__()
+        super(StemV2, self).__init__()
 
 
         self.conv1 = conv3x3(in_planes =in_planes,out_channels=32,stride=2, padding=0)
@@ -42,8 +42,8 @@ class StemV2(nn.Module):
         self.conv5 = conv1x1(in_planes=160, out_channels=64,  stride=1, padding=1)
         self.conv6 = conv3x3(in_planes=64, out_channels=96, stride=1, padding=0)
         self.conv7 = conv1x1(in_planes=160, out_channels=64,  stride=1, padding=1)
-        self.conv8 = conv7x1(in_planes=64, out_channels=64, stride=1, padding=(3,0))
-        self.conv9 = conv1x7(in_planes=64, out_channels=64, stride=1, padding=(0,3))
+        self.conv8 = nn.Conv2d(in_channels=64, out_channels=64, stride=1, kernel_size=(1, 7), padding=(0, 3))
+        self.conv9 = nn.Conv2d(in_channels=64, out_channels=64, stride=1, kernel_size=(7, 1), padding=(3, 0))
         self.conv10 = conv3x3(in_planes=64, out_channels=96, stride=1, padding=0)
         self.conv11 = conv3x3(in_planes=96, out_channels=192, stride=1, padding=0)
         self.maxpool2 = nn.MaxPool2d(kernel_size=1, stride=2, padding=0)
